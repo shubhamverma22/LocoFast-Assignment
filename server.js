@@ -15,7 +15,7 @@ const authRoutes = require("./routes/auth");
 //dbConnection
 
 //middlewares
-app.use(express.urlencoded({ extended: false })); //work as body-parser
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
 
