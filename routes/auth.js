@@ -1,7 +1,15 @@
 var express = require("express");
 var router = express.Router();
 const { check } = require("express-validator");
-const { signout, signup, signin} = require("../controllers/auth");
+const {
+	signout,
+	signup,
+	signin,
+	getAllBlogs,
+	getBlogById,
+	updateBlogById,
+	deleteBlogById,
+} = require("../controllers/auth");
 
 //Sign Up
 router.post(
@@ -26,14 +34,14 @@ router.post(
 	signin
 );
 
+
+
 //Sign Out
 router.get("/signout", signout);
 
-
 router.get("/blogs", getAllBlogs);
-router.get("/blog/:id",getBlogById);
-router.put("/blog/:id",updateBlogById);
+router.get("/blog/:id", getBlogById);
+router.put("/blog/:id", updateBlogById);
 router.delete("/blog/:id", deleteBlogById);
-
 
 module.exports = router;

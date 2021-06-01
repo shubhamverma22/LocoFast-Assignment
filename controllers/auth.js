@@ -5,13 +5,14 @@ const jwt = require("jsonwebtoken");
 exports.signin = async (req, res) => {
 	try {
 		const { email, password } = req.body;
+		console.log(req.body);
 		if (!email || !password) {
 			return res
 				.status(400)
 				.send({ message: "Please Provide Email and Password" });
 		}
 		mysqlConnection.query(
-			"SELECT * FROM users WHERE email = ?",
+			"SELECT * FROM user_info WHERE username = ?",
 			[email],
 			async (err, results) => {
 				console.log(results);
@@ -35,7 +36,7 @@ exports.signin = async (req, res) => {
 						httpOnly: true, //To prevent from hacking
 					};
 					res.cookie("jwt", token, cookieOptions);
-					res.status(200);
+					res.status(200).send({ message: "Login Successfully" });
 				}
 			}
 		);
@@ -49,7 +50,7 @@ exports.signup = (req, res) => {
 	const { name, email, password, confirmPass } = req.body;
 
 	mysqlConnection.query(
-		"SELECT email FROM users WHERE email = ?",
+		"SELECT username FROM user_info WHERE username = ?",
 		[email],
 		async (err, results) => {
 			if (err) {
@@ -65,8 +66,8 @@ exports.signup = (req, res) => {
 			console.log(hashedPassword);
 
 			mysqlConnection.query(
-				"INSERT INTO users SET ?",
-				{ name: name, email: email, password: hashedPassword },
+				"INSERT INTO user_info SET ?",
+				{ name: name, username: email, password: hashedPassword },
 				(err, results) => {
 					if (err) {
 						console.log(err);
@@ -123,14 +124,38 @@ exports.getBlogById = (req, res) => {
 
 exports.updateBlogById = (req, res) => {
 	const blogId = Number(req.param.id);
+	const { title, author, content } = req.body;
 	mysqlConnection.query(
-		"SELECT * FROM blog WHERE id = ?",
-		[blogId],
+		"UPDATE blogs SET title = ?, author = ?, content=? WHERE id = ?",
+		[title, author, content, blogId],
 		async (err, result) => {
 			if (err) {
-				console.log(err);
+				console.log("error:", err);
 			}
-      
 		}
 	);
 };
+
+exports.deleteBlogById = (req, res) => {
+	const blogId = Number(req.param.id);
+	if (!blogId) {
+		return res.send({ meassage: "Please Enter Valid Id Format" });
+	} else {
+		mysqlConnection.query(
+			"DELETE FROM users WHERE id = ?",
+			[blogId],
+			(err, result) => {
+				if (err) {
+					console.log("error:", err);
+					return res.send({ message: "Unable to Delete the Blog" });
+				} else {
+				}
+			}
+		);
+	}
+};
+
+// exports.isSignedIn = expressJwt({
+// 	secret: process.env.JWT_SECRET,
+// 	userProperty: "auth", //it sends the same id which user is signed in somewher you see req.auth which actual belongs from here
+// });
